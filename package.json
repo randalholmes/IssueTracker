@@ -1,0 +1,25 @@
+{
+  "name": "issuetracker",
+  "version": "1.0.0",
+  "description": "a MERN based issue tracking single page application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/randalholmes/IssueTracker.git"
+  },
+  "keywords": [
+    "Mongo",
+    "Express",
+    "React",
+    "Node"
+  ],
+  "author": "Randal Holmes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/randalholmes/IssueTracker/issues"
+  },
+  "homepage": "https://github.com/randalholmes/IssueTracker#readme"
+}
