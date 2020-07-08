@@ -30,7 +30,7 @@ const validIssueStatus = {
   Closed: true,
 };
 
-const issueFieldType = {
+const issueFieldTypes = {
   id: 'required',
   status: 'required',
   owner: 'required',
@@ -41,8 +41,10 @@ const issueFieldType = {
 };
 
 function validateIssue(issue) {
-  for (const field in issueFieldType) {
-    const type = issueFieldType[field];
+  // check that the fields in issue match fields in issueFieldTypes and
+  // that required fields have values.
+  for (const field in issue) {
+    const type = issueFieldTypes[field];
     if (!type) {
       delete issue[field];
     } else if (type === 'required' && !issue[field]) {
@@ -50,6 +52,7 @@ function validateIssue(issue) {
     }
   }
 
+  // check that issue.status is a valid value
   if (!validIssueStatus[issue.status])
     return '${issue.status} is not a valid status.';
 
@@ -57,13 +60,16 @@ function validateIssue(issue) {
 }
 
 
-
+// returns all issue records
 app.get('/api/issues', (req, res) => {
   const metadata = {total_count: issues.length};
   res.json({_metadata: metadata, records: issues});
 });
 
 
+// adds a new issue record if data is valid.
+// returns the completed record for the new issue or error when
+// data is invalid.
 app.post('/api/issues', (req, res) => {
   const newIssue = req.body;
   newIssue.id = issues.length + 1;
