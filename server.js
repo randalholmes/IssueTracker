@@ -80,7 +80,6 @@ app.get('/api/issues', (req, res) => {
 // data is invalid.
 app.post('/api/issues', (req, res) => {
   const newIssue = req.body;
-  newIssue.id = issues.length + 1;
   newIssue.created = new Date();
 
   if (!newIssue.status)
@@ -89,19 +88,35 @@ app.post('/api/issues', (req, res) => {
   const err = validateIssue(newIssue);
   if (err){
     res.status(422).json({message: `Invalid request: ${err}`});
-  } else {
-    issues.push(newIssue);
-    res.json(newIssue);
+    return;
   }
+
+  db.collection('issues').insertOne(newIssue)
+  .then(result => {
+    db.collection('issues').find({_id: result.insertedId}).limit(1).next()
+    .then(newIssue => {
+      res.json(newIssue);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({message: `Internal Server Error: ${error}`});
+    });
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({message: `Internal Server Error: ${error}`});
+  });
 });
+
 
 const client = new MongoClient('mongodb://localhost',
                   { useUnifiedTopology: true });
 
-let db;
+let db; // global database connection reference
+
 client.connect(err => {
   if (!err) {
-    console.log("Connected successfully to server");
+    console.log("Connected successfully to MongoDB server.");
     db = client.db('issuetracker');
     app.listen(3000, () => {
       console.log('App started on port 3000.');
