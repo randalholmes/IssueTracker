@@ -2,6 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const MongoClient = require('mongodb').MongoClient;
 
 const app = express();
 app.use(express.static('static'));
@@ -62,8 +63,15 @@ function validateIssue(issue) {
 
 // returns all issue records
 app.get('/api/issues', (req, res) => {
-  const metadata = {total_count: issues.length};
-  res.json({_metadata: metadata, records: issues});
+  db.collection('issues').find().toArray()
+  .then(issues => {
+    const metadata = {total_count: issues.length};
+    res.json({_metadata: metadata, records:issues});
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({message: `Internal Server Error: ${error}`});
+  });
 });
 
 
@@ -87,7 +95,18 @@ app.post('/api/issues', (req, res) => {
   }
 });
 
+const client = new MongoClient('mongodb://localhost',
+                  { useUnifiedTopology: true });
 
-app.listen(3000, () => {
-  console.log('App started on port 3000.');
+let db;
+client.connect(err => {
+  if (!err) {
+    console.log("Connected successfully to server");
+    db = client.db('issuetracker');
+    app.listen(3000, () => {
+      console.log('App started on port 3000.');
+    });
+  } else {
+    console.log("Database connection error:", err);
+  }
 });

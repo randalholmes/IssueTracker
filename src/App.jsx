@@ -14,7 +14,7 @@ class IssueRow extends React.Component {
     const issue = this.props.issue;
     return (
       <tr>
-        <td>{issue.id}</td>
+        <td>{issue._id}</td>
         <td>{issue.status}</td>
         <td>{issue.owner}</td>
         <td>{issue.created.toDateString()}</td>
@@ -32,7 +32,7 @@ class IssueTable extends React.Component {
 
   render() {
     const issueRows = this.props.issues.map(issue => <IssueRow
-    key={issue.id} issue={issue} />);
+    key={issue._id} issue={issue} />);
 
     return(
       <table className="bordered-table">
@@ -107,16 +107,29 @@ class IssueList extends React.Component {
 
   loadData() {
     fetch('/api/issues')
-    .then(response => response.json())
-    .then(data => {
-      data.records.forEach(issue => {
-        issue.created = new Date(issue.created);
-        if (issue.completionDate)
-          issue.completionDate = new Date(issue.completionDate);
-      });
-      this.setState({issues: data.records});
+    .then(response => {
+      if (response.ok) {
+        response.json()
+        .then(data => {
+          console.log("Total cound of records:", data._metadata.total_count);
+          data.records.forEach(issue => {
+            issue.created = new Date(issue.created);
+            if (issue.completionDate)
+              issue.completionDate = new Date(issue.completionDate);
+          });
+
+          this.setState({issues: data.records});
+        });
+      } else {
+        response.json()
+        .then(error => {
+          alert("Failed to fetch issues:" + error.message);
+        });
+      }
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      alert("Error in fetching data from server:", err);
+    });
   }
 
 
