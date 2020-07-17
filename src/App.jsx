@@ -1,6 +1,6 @@
 //
 
-import IssueAdd from './IssueAdd';
+import IssueAdd from './IssueAdd.jsx';
 
 class IssueFilter extends React.Component {
 
