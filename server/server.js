@@ -9,6 +9,7 @@ const Issue = require('./issue.js');
 
 const app = express();
 app.use(express.static('static'));
+app.use(express.static('dist'));
 app.use(bodyParser.json());
 
 /****  Connect to Database Server and Network Socket ****/
