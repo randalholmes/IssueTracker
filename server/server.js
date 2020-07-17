@@ -5,48 +5,30 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
+const Issue = require('./issue.js');
 
 const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
 
-const validIssueStatus = {
-  New: true,
-  Open: true,
-  Assigned: true,
-  Fixed: true,
-  Verified: true,
-  Closed: true,
-};
+/****  Connect to Database Server and Network Socket ****/
+const client = new MongoClient('mongodb://localhost',
+                  { useUnifiedTopology: true });
 
-const issueFieldTypes = {
-  id: 'required',
-  status: 'required',
-  owner: 'required',
-  effort: 'required',
-  created: 'required',
-  completionDate: 'not required',
-  title: 'required'
-};
+let db; // global database connection reference
 
-// Check that the fields in issue match fields in issueFieldTypes and
-// that required fields have values.
-function validateIssue(issue) {
-  for (const type in issue) {
-    const value = issueFieldTypes[type];
-    if (!value) {
-      delete issue[type];// This type is not valid.
-    } else if (value === 'required' && !issue[type]) {
-      return `${type} is required.`;
-    }
+client.connect(err => {
+  if (!err) {
+    console.log("Connected successfully to MongoDB server.");
+    db = client.db('issuetracker');
+    app.listen(3000, () => {
+      console.log('App started on port 3000.');
+    });
+  } else {
+    console.log("Database connection error:", err);
   }
+});
 
-  // Check that issue.status is a valid value
-  if (!validIssueStatus[issue.status])
-    return `${issue.status} is not a valid status.`;
-
-  return null;
-}
 
 // Returns all issue records
 app.get('/api/issues', async (req,res) => {
@@ -87,7 +69,7 @@ app.post('/api/issues', async (req, res) => {
   if (!newIssue.status)
     newIssue.status = 'New';
 
-  const err = validateIssue(newIssue);
+  const err = Issue.validateIssue(newIssue);
   if (err){
     res.status(422).json({message: `Invalid request: ${err}`});
     return;
@@ -143,22 +125,3 @@ app.post('/api/issues', (req, res) => {
   });
 });
 */
-
-
-/****  Connect to Database Server and Network Socket ****/
-const client = new MongoClient('mongodb://localhost',
-                  { useUnifiedTopology: true });
-
-let db; // global database connection reference
-
-client.connect(err => {
-  if (!err) {
-    console.log("Connected successfully to MongoDB server.");
-    db = client.db('issuetracker');
-    app.listen(3000, () => {
-      console.log('App started on port 3000.');
-    });
-  } else {
-    console.log("Database connection error:", err);
-  }
-});
