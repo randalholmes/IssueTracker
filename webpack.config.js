@@ -1,14 +1,29 @@
 //
 
 const path = require('path');
+const webpack = require('webpack');
 
 
 module.exports = {
   mode: 'development',
-  entry: './src/App.jsx',
+  entry: {
+    app: './src/App.jsx',
+  },
   output: {
     path: path.resolve(__dirname, 'static'),
-    filename: 'app.bundle.js'
+    filename: 'bundle.js'
+  },
+  optimization: {
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
   },
   module: {
     rules: [
@@ -22,5 +37,6 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+
 };

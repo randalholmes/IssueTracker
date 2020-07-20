@@ -3,6 +3,8 @@
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
 
+import React from 'react';
+
 
 class IssueRow extends React.Component {
 
