@@ -37,8 +37,8 @@ app.get('/api/issues', async (req,res) => {
     const metadata = {total_count: issues.length};
     res.json({_metadata: metadata, records:issues});
   } catch(err) {
-    console.log(error);
-    res.status(500).json({message: `Internal Server Error: ${error}`});
+    console.log(err);
+    res.status(500).json({message: `Internal Server Error: ${err}`});
   }
 });
 
@@ -75,6 +75,8 @@ app.post('/api/issues', async (req, res) => {
     return;
   }
 
+  // Add new issue to database. Query database for the new issue,
+  // and then return the new issue to the client.
   try {
     const result = await db.collection('issues').insertOne(newIssue);
     const _newIssue = await db.collection('issues')
