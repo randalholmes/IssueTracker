@@ -6,6 +6,7 @@ const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
+  devtool: 'source-map',
   entry: {
     app: './src/App.jsx',
   },
@@ -38,5 +39,14 @@ module.exports = {
       }
     ]
   },
+  devServer: {
+    port:8000,
+    contentBase: 'static',
+    proxy: {
+      '/api/*': {
+        target: 'http://localhost:3000'
+      }
+    }
+  }
 
 };
